@@ -1,0 +1,16 @@
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/common_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/common_views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Not Found: /
+"GET / HTTP/1.1" 404 2302
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 2353
+Not Found: /api/
+"GET /api/ HTTP/1.1" 404 4615

@@ -1,18 +1,31 @@
-from rest_framework.routers import DefaultRouter
-from . import views
+from django.urls import path, include
+from .views import (
+    # Catálogos públicos
+    MarcaListView,
+    ModeloListView,
+    ModelosPorMarcaView,
+    ServicioTallerListView,
+    
+    # Views específicas por rol (importadas de submódulos)
+    cliente_views,
+    asistente_views,
+    taller_views,
+)
 
-router = DefaultRouter()
-router.register(r'usuarios', views.UsuarioViewSet)
-router.register(r'tipos-usuarios', views.TipoUsuarioViewSet)
-router.register(r'solicitudes', views.SolicitudViewSet)
-router.register(r'vehiculos', views.VehiculoViewSet)
-router.register(r'marcas', views.MarcaViewSet)
-router.register(r'modelos', views.ModeloViewSet)
-router.register(r'propietarios', views.PropietarioViewSet)
-router.register(r'reservaciones', views.ReservacionViewSet)
-router.register(r'servicios-taller', views.ServicioTallerViewSet)
-router.register(r'servicios-reservados', views.ServicioReservadoViewSet)
-router.register(r'progreso-servicio', views.ProgresoServicioViewSet)
-router.register(r'detalle-solicitud', views.DetalleSolicitudViewSet)
+app_name = 'agencia'
 
-urlpatterns = router.urls  
+urlpatterns = [
+    # ==========================================
+    # CATÁLOGOS PÚBLICOS
+    # ==========================================
+    path('marcas/', MarcaListView.as_view(), name='marcas-list'),
+    path('marcas/<int:pk>/modelos/', ModelosPorMarcaView.as_view(), name='modelos-por-marca'),
+    path('servicios-taller/', ServicioTallerListView.as_view(), name='servicios-taller'),
+    
+    # ==========================================
+    # RUTAS POR ROL
+    # ==========================================
+    path('cliente/', include('agencia.api.urls_cliente')),
+    path('asistente/', include('agencia.api.urls_asistente')),
+    path('taller/', include('agencia.api.urls_taller')),
+]

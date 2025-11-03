@@ -1,164 +1,131 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from users.models import Usuario  # relación con usuarios
+
+# ========================
+# MARCAS Y MODELOS
+# ========================
+
+class Marca(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nombre
 
 
-class DetalleSolicitud(models.Model):
-    id_detalle = models.BigAutoField(primary_key=True)
-    id_solicitud = models.ForeignKey('Solicitudes', models.DO_NOTHING, db_column='id_solicitud', blank=True, null=True)
-    id_vehiculo = models.ForeignKey('Vehiculos', models.DO_NOTHING, db_column='id_vehiculo', blank=True, null=True)
-    observaciones = models.TextField(blank=True, null=True)
-    costo = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    creado_at = models.DateTimeField(blank=True, null=True)
+class Modelo(models.Model):
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, related_name='modelos')
+    nombre = models.CharField(max_length=100)
 
-    class Meta:
-        managed = False
-        db_table = 'detalle_solicitud'
+    def __str__(self):
+        return f"{self.id_marca.nombre} {self.nombre}"
 
 
-class Marcas(models.Model):
-    id_marca = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(unique=True, max_length=100, blank=True, null=True)
+# ========================
+# VEHÍCULOS
+# ========================
 
-    class Meta:
-        managed = False
-        db_table = 'marcas'
+class Vehiculo(models.Model):
+    placa = models.CharField(max_length=50, unique=True)
+    id_modelo = models.ForeignKey(Modelo, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
+    id_usuario_propietario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='vehiculos')
+    ano = models.IntegerField(null=True, blank=True)
+    color = models.CharField(max_length=50, null=True, blank=True)
+    creado_at = models.DateTimeField(auto_now_add=True)
 
-
-class Modelos(models.Model):
-    id_modelo = models.BigAutoField(primary_key=True)
-    id_marca = models.ForeignKey(Marcas, models.DO_NOTHING, db_column='id_marca', blank=True, null=True)
-    nombre = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'modelos'
+    def __str__(self):
+        return f"{self.placa} - {self.id_usuario_propietario.nombre}"
 
 
-class ProgresoServicio(models.Model):
-    id_prog_serv = models.BigAutoField(primary_key=True)
-    id_serv_res = models.ForeignKey('ServiciosReservados', models.DO_NOTHING, db_column='id_serv_res')
-    fecha = models.DateTimeField(blank=True, null=True)
-    porcentaje = models.IntegerField(blank=True, null=True)
-    comentario = models.TextField(blank=True, null=True)
-    evidencia_url = models.CharField(max_length=300, blank=True, null=True)
+# ========================
+# SOLICITUDES Y DETALLES
+# ========================
 
-    class Meta:
-        managed = False
-        db_table = 'progreso_servicio'
-
-
-class Propietarios(models.Model):
-    id_propietario = models.BigAutoField(primary_key=True)
-    cve = models.CharField(max_length=50, blank=True, null=True)
-    nombre = models.CharField(max_length=200, blank=True, null=True)
-    contacto = models.CharField(max_length=200, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'propietarios'
-
-
-class Reservaciones(models.Model):
-    id_reservacion = models.BigAutoField(primary_key=True)
-    id_solicitud = models.ForeignKey('Solicitudes', models.DO_NOTHING, db_column='id_solicitud', blank=True, null=True)
-    fecha = models.DateTimeField(blank=True, null=True)
-    hora = models.TimeField(blank=True, null=True)
-    id_estado = models.BigIntegerField(blank=True, null=True)
-    notas = models.TextField(blank=True, null=True)
-    avance_global = models.IntegerField(blank=True, null=True)
-    estado_global = models.CharField(max_length=100, blank=True, null=True)
-    fecha_inicio = models.DateTimeField(blank=True, null=True)
-    fecha_fin = models.DateTimeField(blank=True, null=True)
-    creado_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'reservaciones'
-
-
-class ServiciosReservados(models.Model):
-    id_serv_res = models.BigAutoField(primary_key=True)
-    id_reservacion = models.ForeignKey(Reservaciones, models.DO_NOTHING, db_column='id_reservacion')
-    id_servicio = models.ForeignKey('ServiciosTaller', models.DO_NOTHING, db_column='id_servicio')
-    id_usuario_taller = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='id_usuario_taller', blank=True, null=True)
-    estado = models.CharField(max_length=100, blank=True, null=True)
-    avance_porcentaje = models.IntegerField(blank=True, null=True)
-    observaciones = models.TextField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField(blank=True, null=True)
-    fecha_fin = models.DateTimeField(blank=True, null=True)
-    creado_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'servicios_reservados'
-
-
-class ServiciosTaller(models.Model):
-    id_servicio = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(unique=True, max_length=150)
-    descripcion = models.TextField(blank=True, null=True)
-    costo_base = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    duracion_estimada = models.IntegerField(blank=True, null=True)
-    activo = models.BooleanField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'servicios_taller'
-
-
-class Solicitudes(models.Model):
-    id_solicitud = models.BigAutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey('Vehiculos', models.DO_NOTHING, db_column='id_vehiculo', blank=True, null=True)
-    id_usuario = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True)
-    fecha_creacion = models.DateTimeField(blank=True, null=True)
-    id_estado = models.BigIntegerField(blank=True, null=True)
+class Solicitud(models.Model):
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, related_name='solicitudes')
+    id_usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes_creadas')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    id_estado = models.BigIntegerField(null=True, blank=True)
     descripcion = models.TextField(blank=True, null=True)
     referencia_externa = models.CharField(max_length=100, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'solicitudes'
+    def __str__(self):
+        return f"Solicitud {self.id} - {self.id_usuario.nombre}"
 
 
-class TiposUsuarios(models.Model):
-    id_tipo = models.BigAutoField(primary_key=True)
-    cve = models.CharField(unique=True, max_length=20)
-    descripcion = models.CharField(max_length=100)
+class DetalleSolicitud(models.Model):
+    id_solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='detalles')
+    observaciones = models.TextField(blank=True, null=True)
+    costo = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    creado_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        managed = False
-        db_table = 'tipos_usuarios'
-
-
-class Usuarios(models.Model):
-    id_usuario = models.BigAutoField(primary_key=True)
-    cve = models.CharField(unique=True, max_length=50, blank=True, null=True)
-    id_tipo = models.ForeignKey(TiposUsuarios, models.DO_NOTHING, db_column='id_tipo', blank=True, null=True)
-    nombre = models.CharField(max_length=200, blank=True, null=True)
-    email = models.CharField(max_length=200, blank=True, null=True)
-    telefono = models.CharField(max_length=50, blank=True, null=True)
-    creado_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'usuarios'
+    def __str__(self):
+        return f"Detalle de Solicitud {self.id_solicitud.id}"
 
 
-class Vehiculos(models.Model):
-    id_vehiculo = models.BigAutoField(primary_key=True)
-    placa = models.CharField(unique=True, max_length=50, blank=True, null=True)
-    id_modelo = models.ForeignKey(Modelos, models.DO_NOTHING, db_column='id_modelo', blank=True, null=True)
-    id_propietario = models.ForeignKey(Propietarios, models.DO_NOTHING, db_column='id_propietario', blank=True, null=True)
-    ano = models.IntegerField(blank=True, null=True)
-    color = models.CharField(max_length=50, blank=True, null=True)
-    creado_at = models.DateTimeField(blank=True, null=True)
+# ========================
+# RESERVACIONES
+# ========================
 
-    class Meta:
-        managed = False
-        db_table = 'vehiculos'
+class Reservacion(models.Model):
+    id_solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='reservaciones')
+    fecha = models.DateTimeField(null=True, blank=True)
+    hora = models.TimeField(null=True, blank=True)
+    id_estado = models.BigIntegerField(null=True, blank=True)
+    notas = models.TextField(blank=True, null=True)
+    avance_global = models.IntegerField(default=0)
+    estado_global = models.CharField(max_length=100, default='pendiente')
+    fecha_inicio = models.DateTimeField(null=True, blank=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
+    creado_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reservación {self.id} - {self.id_solicitud.id}"
+
+
+# ========================
+# SERVICIOS DEL TALLER
+# ========================
+
+class ServicioTaller(models.Model):
+    nombre = models.CharField(max_length=150, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    costo_base = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    duracion_estimada = models.IntegerField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+# ========================
+# SERVICIOS RESERVADOS
+# ========================
+
+class ServicioReservado(models.Model):
+    id_reservacion = models.ForeignKey(Reservacion, on_delete=models.CASCADE, related_name='servicios_reservados')
+    id_servicio = models.ForeignKey(ServicioTaller, on_delete=models.CASCADE, related_name='servicios_reservados')
+    id_usuario_taller = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='servicios_asignados')
+    estado = models.CharField(max_length=100, default='pendiente')
+    avance_porcentaje = models.IntegerField(default=0)
+    observaciones = models.TextField(blank=True, null=True)
+    fecha_inicio = models.DateTimeField(null=True, blank=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
+    creado_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.id_servicio.nombre} - {self.estado}"
+
+
+# ========================
+# PROGRESO DE SERVICIO
+# ========================
+
+class ProgresoServicio(models.Model):
+    id_serv_res = models.ForeignKey(ServicioReservado, on_delete=models.CASCADE, related_name='progresos')
+    fecha = models.DateTimeField(auto_now_add=True)
+    porcentaje = models.IntegerField(null=True, blank=True)
+    comentario = models.TextField(blank=True, null=True)
+    evidencia_url = models.CharField(max_length=300, blank=True, null=True)
+
+    def __str__(self):
+        return f"Progreso {self.porcentaje}% del servicio {self.id_serv_res.id}"
