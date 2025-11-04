@@ -31,11 +31,22 @@ class LoginView(APIView):
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
         
-        # Aquí deberías implementar tu lógica de autenticación
-        # Por ahora es un ejemplo simple
         try:
             user = Usuario.objects.get(email=email)
-            # TODO: Verificar password con hash
+            
+            # ✅ Verificar password correctamente
+            if not user.check_password(password):
+                return Response(
+                    {'error': 'Credenciales inválidas'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            # Verificar que el usuario esté activo
+            if not user.is_active:
+                return Response(
+                    {'error': 'Usuario inactivo'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
             
             # Generar tokens JWT
             refresh = RefreshToken.for_user(user)
@@ -62,8 +73,15 @@ class LogoutView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response(
+                    {'error': 'Refresh token requerido'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             token = RefreshToken(refresh_token)
             token.blacklist()
+            
             return Response(
                 {'message': 'Sesión cerrada exitosamente'},
                 status=status.HTTP_200_OK
@@ -114,6 +132,8 @@ class MeView(APIView):
         serializer = UsuarioSerializer(request.user)
         return Response(serializer.data)
 
+
+# ... resto del código igual (PerfilUsuarioView, etc.)
 
 # ==========================================
 # PERFIL DE USUARIO

@@ -22,5 +22,5 @@ urlpatterns = [
     
     # APIs
     path('api/', include('users.api.urls')),
-    #path('api/', include('agencia.api.urls')),
+    path('api/', include('agencia.api.urls')),
 ]
