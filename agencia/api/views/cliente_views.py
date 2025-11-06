@@ -5,13 +5,14 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from agencia.models import (
     Vehiculo, Solicitud, Reservacion, 
-    ServicioReservado, ProgresoServicio
+    ServicioReservado, ProgresoServicio, DisponibilidadHorario
 )
 from ..serializers import (
     VehiculoSerializer, VehiculoCreateSerializer,
     SolicitudSerializer, SolicitudCreateSerializer,
     ReservacionSerializer, ServicioReservadoSerializer,
-    ProgresoServicioSerializer
+    ProgresoServicioSerializer, DisponibilidadHorarioSerializer,
+    ReservacionConHorarioSerializer
 )
 from ..permissions import IsCliente
 
@@ -132,6 +133,8 @@ class ReservacionClienteDetailView(generics.RetrieveAPIView):
 class CancelarReservacionView(APIView):
     """
     PUT /api/cliente/reservaciones/{id}/cancelar/
+    
+    🆕 Ahora libera el horario automáticamente
     """
     permission_classes = [IsAuthenticated, IsCliente]
     
@@ -142,17 +145,20 @@ class CancelarReservacionView(APIView):
             id_solicitud__id_usuario=request.user
         )
         
-        # Solo se puede cancelar si está pendiente
         if reservacion.estado_global != 'pendiente':
             return Response(
                 {'error': 'Solo se pueden cancelar reservaciones pendientes'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Liberar horario
+        if reservacion.horario:
+            reservacion.horario.liberar()
+        
         reservacion.estado_global = 'cancelada'
         reservacion.save()
         
-        serializer = ReservacionSerializer(reservacion)
+        serializer = ReservacionConHorarioSerializer(reservacion)
         return Response(serializer.data)
 
 
@@ -188,3 +194,37 @@ class ProgresoServicioView(generics.ListAPIView):
             id_serv_res_id=servicio_id,
             id_serv_res__id_reservacion__id_solicitud__id_usuario=self.request.user
         ).order_by('-fecha')
+    
+class HorariosDisponiblesView(generics.ListAPIView):
+    """
+    GET /api/cliente/horarios-disponibles/
+    
+    Ver horarios disponibles para agendar
+    Filtros: ?fecha=2025-11-10&fecha_desde=2025-11-10&fecha_hasta=2025-11-15
+    """
+    serializer_class = DisponibilidadHorarioSerializer
+    permission_classes = [IsAuthenticated, IsCliente]
+    
+    def get_queryset(self):
+        queryset = DisponibilidadHorario.objects.filter(
+            estado='disponible',
+            fecha__gte=datetime.now().date()  # Solo fechas futuras
+        ).filter(
+            reservaciones_actuales__lt=models.F('capacidad')  # Que tengan espacio
+        )
+        
+        # Filtros opcionales
+        fecha = self.request.query_params.get('fecha')
+        fecha_desde = self.request.query_params.get('fecha_desde')
+        fecha_hasta = self.request.query_params.get('fecha_hasta')
+        
+        if fecha:
+            queryset = queryset.filter(fecha=fecha)
+        if fecha_desde:
+            queryset = queryset.filter(fecha__gte=fecha_desde)
+        if fecha_hasta:
+            queryset = queryset.filter(fecha__lte=fecha_hasta)
+        
+        return queryset.order_by('fecha', 'hora_inicio')
+
+

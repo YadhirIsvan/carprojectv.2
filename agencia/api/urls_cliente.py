@@ -16,6 +16,9 @@ from .views.cliente_views import (
     # Seguimiento
     ServiciosReservacionView,
     ProgresoServicioView,
+
+    # 🆕 Ver horarios disponibles
+    HorariosDisponiblesView,
 )
 
 app_name = 'cliente'
@@ -45,4 +48,9 @@ urlpatterns = [
     # ==========================================
     path('reservaciones/<int:reservacion_id>/servicios/', ServiciosReservacionView.as_view(), name='servicios-reservacion'),
     path('servicios/<int:servicio_id>/progreso/', ProgresoServicioView.as_view(), name='progreso-servicio'),
+
+    # ==========================================
+    # HORARIOS DISPONIBLES
+    # ==========================================
+    path('horarios-disponibles/', HorariosDisponiblesView.as_view(), name='horarios-disponibles'),
 ]

@@ -20,6 +20,13 @@ from .views.asistente_views import (
     ClientesListView,
     VehiculosListView,
     TecnicosListView,
+
+    # 🆕 Disponibilidad
+    DisponibilidadHorarioListCreateView,
+    DisponibilidadHorarioDetailView,
+    CrearHorariosMultiplesView,
+    BloquearHorarioView,
+    LiberarHorarioView,
 )
 
 app_name = 'asistente'
@@ -53,4 +60,14 @@ urlpatterns = [
     path('clientes/', ClientesListView.as_view(), name='clientes-list'),
     path('vehiculos/', VehiculosListView.as_view(), name='vehiculos-list'),
     path('tecnicos/', TecnicosListView.as_view(), name='tecnicos-list'),
+
+
+    # ==========================================
+    # DISPONIBILIDAD DE HORARIOS
+    # ==========================================
+    path('disponibilidad/', DisponibilidadHorarioListCreateView.as_view(), name='disponibilidad-list-create'),
+    path('disponibilidad/<int:pk>/', DisponibilidadHorarioDetailView.as_view(), name='disponibilidad-detail'),
+    path('disponibilidad/crear-multiples/', CrearHorariosMultiplesView.as_view(), name='crear-horarios-multiples'),
+    path('disponibilidad/<int:pk>/bloquear/', BloquearHorarioView.as_view(), name='bloquear-horario'),
+    path('disponibilidad/<int:pk>/liberar/', LiberarHorarioView.as_view(), name='liberar-horario'),
 ]

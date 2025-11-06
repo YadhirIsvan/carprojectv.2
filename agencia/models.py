@@ -65,11 +65,98 @@ class DetalleSolicitud(models.Model):
 # ========================
 # RESERVACIONES
 # ========================
+# agencia/models.py
 
+class DisponibilidadHorario(models.Model):
+    """
+    Horarios disponibles del taller para reservaciones
+    """
+    ESTADO_CHOICES = [
+        ('disponible', 'Disponible'),
+        ('reservado', 'Reservado'),
+        ('bloqueado', 'Bloqueado'),  # Para mantenimiento o días festivos
+    ]
+    
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible')
+    capacidad = models.IntegerField(default=1)  # Cuántos autos puede atender simultáneamente
+    reservaciones_actuales = models.IntegerField(default=0)
+    
+    # Relación con reservación (si está ocupado)
+    reservacion = models.ForeignKey(
+        'Reservacion', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='horario_asignado'
+    )
+    
+    # Metadata
+    creado_por = models.ForeignKey(
+        'users.Usuario', 
+        on_delete=models.SET_NULL, 
+        null=True,
+        related_name='horarios_creados'
+    )
+    creado_at = models.DateTimeField(auto_now_add=True)
+    actualizado_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['fecha', 'hora_inicio']
+        unique_together = ['fecha', 'hora_inicio', 'hora_fin']
+        verbose_name = 'Disponibilidad de Horario'
+        verbose_name_plural = 'Disponibilidades de Horarios'
+    
+    def __str__(self):
+        return f"{self.fecha} {self.hora_inicio}-{self.hora_fin} ({self.estado})"
+    
+    @property
+    def esta_disponible(self):
+        """Verifica si el horario está disponible"""
+        return (
+            self.estado == 'disponible' and 
+            self.reservaciones_actuales < self.capacidad
+        )
+    
+    def reservar(self, reservacion):
+        """Marca el horario como reservado"""
+        if not self.esta_disponible:
+            raise ValueError("Este horario no está disponible")
+        
+        self.reservaciones_actuales += 1
+        if self.reservaciones_actuales >= self.capacidad:
+            self.estado = 'reservado'
+        self.reservacion = reservacion
+        self.save()
+    
+    def liberar(self):
+        """Libera el horario cuando se cancela una reservación"""
+        if self.reservaciones_actuales > 0:
+            self.reservaciones_actuales -= 1
+        
+        if self.reservaciones_actuales < self.capacidad:
+            self.estado = 'disponible'
+            self.reservacion = None
+        self.save()
+        
 class Reservacion(models.Model):
     id_solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='reservaciones')
+    
+    # 🆕 Ahora usa DisponibilidadHorario
+    horario = models.ForeignKey(
+        DisponibilidadHorario, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='reservaciones'
+    )
+    
+    # Mantener campos para compatibilidad (opcional)
     fecha = models.DateTimeField(null=True, blank=True)
     hora = models.TimeField(null=True, blank=True)
+    
     id_estado = models.BigIntegerField(null=True, blank=True)
     notas = models.TextField(blank=True, null=True)
     avance_global = models.IntegerField(default=0)
@@ -77,11 +164,17 @@ class Reservacion(models.Model):
     fecha_inicio = models.DateTimeField(null=True, blank=True)
     fecha_fin = models.DateTimeField(null=True, blank=True)
     creado_at = models.DateTimeField(auto_now_add=True)
-
+    
+    def save(self, *args, **kwargs):
+        # Auto-sincronizar fecha/hora desde horario
+        if self.horario:
+            self.fecha = self.horario.fecha
+            self.hora = self.horario.hora_inicio
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"Reservación {self.id} - {self.id_solicitud.id}"
-
-
+    
 # ========================
 # SERVICIOS DEL TALLER
 # ========================
@@ -129,3 +222,4 @@ class ProgresoServicio(models.Model):
 
     def __str__(self):
         return f"Progreso {self.porcentaje}% del servicio {self.id_serv_res.id}"
+

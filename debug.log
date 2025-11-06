@@ -92,3 +92,66 @@ Bad Request: /api/asistente/solicitudes/1/detalle/
 "GET /api/cliente/reservaciones/ HTTP/1.1" 200 574
 /home/yadhir/Documentos/carproject/users/api/views.py changed, reloading.
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"POST /api/auth/login/ HTTP/1.1" 200 704
+"GET /api/taller/mis-servicios/ HTTP/1.1" 200 52
+"POST /api/auth/login/ HTTP/1.1" 200 690
+"POST /api/auth/login/ HTTP/1.1" 200 699
+"GET /api/marcas/ HTTP/1.1" 200 131
+"GET /api/marcas/ HTTP/1.1" 200 131
+"GET /api/marcas/2/modelos/ HTTP/1.1" 200 165
+"GET /api/servicios-taller/ HTTP/1.1" 200 774
+"GET /api/tipos-usuarios/ HTTP/1.1" 200 265
+"GET /api/asistente/solicitudes/ HTTP/1.1" 200 716
+"POST /api/cliente/solicitudes/ HTTP/1.1" 201 124
+"GET /api/cliente/reservaciones/ HTTP/1.1" 200 574
+"GET /api/asistente/solicitudes/ HTTP/1.1" 200 1286
+"PATCH /api/asistente/solicitudes/2/estado/ HTTP/1.1" 200 566
+/home/yadhir/Documentos/carproject/agencia/models.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/models.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/models.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/models.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/serializers.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/serializers.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/serializers.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/urls_asistente.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/urls_asistente.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/urls_cliente.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/asistente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/yadhir/Documentos/carproject/agencia/api/views/cliente_views.py changed, reloading.
+Watching for file changes with StatReloader

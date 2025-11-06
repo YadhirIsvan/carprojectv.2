@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from agencia.models import (
     Marca, Modelo, Vehiculo, Solicitud, DetalleSolicitud,
-    Reservacion, ServicioTaller, ServicioReservado, ProgresoServicio
+    Reservacion, ServicioTaller, ServicioReservado, ProgresoServicio, DisponibilidadHorario
 )
 from users.models import Usuario
 
@@ -284,3 +284,131 @@ class ProgresoServicioSerializer(serializers.ModelSerializer):
         if value < 0 or value > 100:
             raise serializers.ValidationError("El porcentaje debe estar entre 0 y 100")
         return value
+    
+# agencia/api/serializers.py
+
+class DisponibilidadHorarioSerializer(serializers.ModelSerializer):
+    esta_disponible = serializers.BooleanField(read_only=True)
+    dia_semana = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = DisponibilidadHorario
+        fields = [
+            'id', 'fecha', 'hora_inicio', 'hora_fin', 
+            'estado', 'capacidad', 'reservaciones_actuales',
+            'esta_disponible', 'dia_semana', 'creado_at'
+        ]
+        read_only_fields = ['id', 'reservaciones_actuales', 'creado_at']
+    
+    def get_dia_semana(self, obj):
+        dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+        return dias[obj.fecha.weekday()]
+
+
+class DisponibilidadHorarioCreateSerializer(serializers.ModelSerializer):
+    """
+    Para crear múltiples horarios de una vez
+    """
+    class Meta:
+        model = DisponibilidadHorario
+        fields = ['fecha', 'hora_inicio', 'hora_fin', 'capacidad', 'estado']
+    
+    def validate(self, data):
+        # Validar que hora_fin > hora_inicio
+        if data['hora_fin'] <= data['hora_inicio']:
+            raise serializers.ValidationError({
+                'hora_fin': 'La hora de fin debe ser posterior a la hora de inicio'
+            })
+        
+        # Validar que no haya solapamiento
+        fecha = data['fecha']
+        hora_inicio = data['hora_inicio']
+        hora_fin = data['hora_fin']
+        
+        solapamiento = DisponibilidadHorario.objects.filter(
+            fecha=fecha,
+            hora_inicio__lt=hora_fin,
+            hora_fin__gt=hora_inicio
+        )
+        
+        if solapamiento.exists():
+            raise serializers.ValidationError(
+                'Ya existe un horario que se solapa con este rango'
+            )
+        
+        return data
+
+
+class ReservacionConHorarioSerializer(serializers.ModelSerializer):
+    """
+    Serializer actualizado para reservaciones con horarios
+    """
+    horario_info = DisponibilidadHorarioSerializer(source='horario', read_only=True)
+    solicitud_info = serializers.SerializerMethodField()
+    vehiculo_info = serializers.SerializerMethodField()
+    servicios_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Reservacion
+        fields = [
+            'id', 'id_solicitud', 'horario', 'horario_info',
+            'solicitud_info', 'vehiculo_info',
+            'notas', 'avance_global', 'estado_global',
+            'fecha_inicio', 'fecha_fin', 'creado_at',
+            'servicios_count'
+        ]
+        read_only_fields = ['id', 'creado_at', 'fecha', 'hora']
+    
+    def get_solicitud_info(self, obj):
+        return {
+            'id': obj.id_solicitud.id,
+            'descripcion': obj.id_solicitud.descripcion,
+            'usuario': obj.id_solicitud.id_usuario.nombre
+        }
+    
+    def get_vehiculo_info(self, obj):
+        vehiculo = obj.id_solicitud.id_vehiculo
+        return {
+            'placa': vehiculo.placa,
+            'modelo': vehiculo.id_modelo.nombre if vehiculo.id_modelo else None,
+            'marca': vehiculo.id_modelo.id_marca.nombre if vehiculo.id_modelo else None,
+            'color': vehiculo.color
+        }
+    
+    def get_servicios_count(self, obj):
+        return obj.servicios_reservados.count()
+
+
+class ReservacionCreateConHorarioSerializer(serializers.ModelSerializer):
+    """
+    Para crear reservación seleccionando un horario disponible
+    """
+    class Meta:
+        model = Reservacion
+        fields = ['id_solicitud', 'horario', 'notas']
+    
+    def validate_horario(self, value):
+        if not value.esta_disponible:
+            raise serializers.ValidationError(
+                'Este horario ya no está disponible'
+            )
+        return value
+    
+    def validate_id_solicitud(self, value):
+        # Verificar que la solicitud no tenga ya una reservación activa
+        if value.reservaciones.filter(
+            estado_global__in=['pendiente', 'confirmada', 'en_progreso']
+        ).exists():
+            raise serializers.ValidationError(
+                'Esta solicitud ya tiene una reservación activa'
+            )
+        return value
+    
+    def create(self, validated_data):
+        horario = validated_data['horario']
+        reservacion = Reservacion.objects.create(**validated_data)
+        
+        # Marcar horario como reservado
+        horario.reservar(reservacion)
+        
+        return reservacion
