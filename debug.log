@@ -92,3 +92,25 @@ Bad Request: /api/asistente/solicitudes/1/detalle/
 "GET /api/cliente/reservaciones/ HTTP/1.1" 200 574
 /home/yadhir/Documentos/carproject/users/api/views.py changed, reloading.
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"POST /api/auth/login/ HTTP/1.1" 200 690
+"POST /api/auth/login/ HTTP/1.1" 200 699
+"POST /api/auth/login/ HTTP/1.1" 200 704
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Unauthorized: /api/cliente/vehiculos/
+"GET /api/cliente/vehiculos/ HTTP/1.1" 401 184
+"POST /api/auth/login/ HTTP/1.1" 200 690
+"POST /api/cliente/vehiculos/ HTTP/1.1" 201 61
+"GET /api/cliente/vehiculos/ HTTP/1.1" 200 563
+"GET /api/cliente/vehiculos/1/ HTTP/1.1" 200 260
+"GET /api/cliente/solicitudes/ HTTP/1.1" 200 716
+"POST /api/cliente/solicitudes/ HTTP/1.1" 201 111
+"GET /api/cliente/solicitudes/ HTTP/1.1" 200 1263
+"GET /api/cliente/reservaciones/ HTTP/1.1" 200 574
+"PUT /api/cliente/reservaciones/1/cancelar/ HTTP/1.1" 200 522
+"GET /api/cliente/reservaciones/ HTTP/1.1" 200 574
+Unauthorized: /api/asistente/solicitudes/
+"GET /api/asistente/solicitudes/ HTTP/1.1" 401 184
+"POST /api/auth/login/ HTTP/1.1" 200 699

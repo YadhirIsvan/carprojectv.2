@@ -1,0 +1,878 @@
+{
+	"info": {
+		"name": "Sistema Taller Automotriz",
+		"description": "API completa para gestión de taller con 3 roles: Cliente, Asistente y Taller",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token_cliente",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_asistente",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_taller",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Autenticación",
+			"item": [
+				{
+					"name": "Login - Cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('token_cliente', jsonData.access);",
+									"    console.log('✅ Token cliente guardado');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"juan@cliente.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Login - Asistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('token_asistente', jsonData.access);",
+									"    console.log('✅ Token asistente guardado');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"maria@taller.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Login - Técnico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('token_taller', jsonData.access);",
+									"    console.log('✅ Token técnico guardado');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"carlos@taller.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Me - Info Usuario Actual",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me", ""]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"tu_refresh_token_aqui\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/logout/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Catálogos",
+			"item": [
+				{
+					"name": "Listar Marcas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/marcas/",
+							"host": ["{{base_url}}"],
+							"path": ["marcas", ""]
+						}
+					}
+				},
+				{
+					"name": "Modelos por Marca",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/marcas/1/modelos/",
+							"host": ["{{base_url}}"],
+							"path": ["marcas", "1", "modelos", ""]
+						}
+					}
+				},
+				{
+					"name": "Servicios del Taller",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/servicios-taller/",
+							"host": ["{{base_url}}"],
+							"path": ["servicios-taller", ""]
+						}
+					}
+				},
+				{
+					"name": "Tipos de Usuario",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tipos-usuarios/",
+							"host": ["{{base_url}}"],
+							"path": ["tipos-usuarios", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🚗 Cliente - Vehículos",
+			"item": [
+				{
+					"name": "Listar Mis Vehículos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/vehiculos/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "vehiculos", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Vehículo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"placa\": \"ABC-1234\",\n    \"id_modelo\": 1,\n    \"ano\": 2021,\n    \"color\": \"Rojo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/cliente/vehiculos/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "vehiculos", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Detalle Vehículo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/vehiculos/1/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "vehiculos", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Vehículo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"placa\": \"ABC-1234\",\n    \"id_modelo\": 1,\n    \"ano\": 2021,\n    \"color\": \"Azul Metalizado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/cliente/vehiculos/1/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "vehiculos", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Vehículo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/vehiculos/1/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "vehiculos", "1", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📝 Cliente - Solicitudes",
+			"item": [
+				{
+					"name": "Listar Mis Solicitudes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/solicitudes/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "solicitudes", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Solicitud",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_vehiculo\": 1,\n    \"descripcion\": \"Mi auto hace un ruido extraño en el motor al acelerar\",\n    \"referencia_externa\": \"SOL-2025-001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/cliente/solicitudes/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "solicitudes", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Detalle Solicitud",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/solicitudes/1/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "solicitudes", "1", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📅 Cliente - Reservaciones",
+			"item": [
+				{
+					"name": "Listar Mis Reservaciones",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/reservaciones/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "reservaciones", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Detalle Reservación",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/reservaciones/1/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "reservaciones", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Cancelar Reservación",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/reservaciones/1/cancelar/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "reservaciones", "1", "cancelar", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Servicios de Reservación",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/reservaciones/1/servicios/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "reservaciones", "1", "servicios", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Progreso de Servicio",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_cliente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cliente/servicios/1/progreso/",
+							"host": ["{{base_url}}"],
+							"path": ["cliente", "servicios", "1", "progreso", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👔 Asistente - Solicitudes",
+			"item": [
+				{
+					"name": "Listar Todas las Solicitudes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/solicitudes/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "solicitudes", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Detalle Solicitud",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/solicitudes/1/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "solicitudes", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Cambiar Estado Solicitud",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_estado\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/asistente/solicitudes/1/estado/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "solicitudes", "1", "estado", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Detalle Solicitud",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"observaciones\": \"Se requiere cambio de aceite y revisión de frenos\",\n    \"costo\": 1250.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/asistente/solicitudes/1/detalle/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "solicitudes", "1", "detalle", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👔 Asistente - Reservaciones",
+			"item": [
+				{
+					"name": "Listar Todas las Reservaciones",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/reservaciones/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "reservaciones", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Reservación",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_solicitud\": 1,\n    \"fecha\": \"2025-11-10T09:00:00\",\n    \"hora\": \"09:00:00\",\n    \"notas\": \"Cliente prefiere horario matutino\",\n    \"fecha_inicio\": \"2025-11-10T09:00:00\",\n    \"fecha_fin\": \"2025-11-10T12:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/asistente/reservaciones/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "reservaciones", ""]
+						}
+					}
+				},
+				{
+					"name": "Asignar Servicios a Reservación",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"servicios\": [\n        {\n            \"id_servicio\": 1,\n            \"id_usuario_taller\": 4\n        },\n        {\n            \"id_servicio\": 4,\n            \"id_usuario_taller\": 4\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/asistente/reservaciones/1/servicios/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "reservaciones", "1", "servicios", ""]
+						}
+					}
+				},
+				{
+					"name": "Asignar Técnico a Servicio",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_usuario_taller\": 4\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/asistente/servicios-reservados/1/asignar-tecnico/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "servicios-reservados", "1", "asignar-tecnico", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👔 Asistente - Consultas",
+			"item": [
+				{
+					"name": "Listar Clientes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/clientes/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "clientes", ""]
+						}
+					}
+				},
+				{
+					"name": "Listar Todos los Vehículos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/vehiculos/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "vehiculos", ""]
+						}
+					}
+				},
+				{
+					"name": "Listar Técnicos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_asistente}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asistente/tecnicos/",
+							"host": ["{{base_url}}"],
+							"path": ["asistente", "tecnicos", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔧 Taller - Mis Servicios",
+			"item": [
+				{
+					"name": "Listar Mis Servicios Asignados",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_taller}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/taller/mis-servicios/",
+							"host": ["{{base_url}}"],
+							"path": ["taller", "mis-servicios", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Detalle de Mi Servicio",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_taller}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/taller/mis-servicios/1/",
+							"host": ["{{base_url}}"],
+							"path": ["taller", "mis-servicios", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Cambiar Estado de Servicio",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_taller}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estado\": \"en_progreso\",\n    \"avance_porcentaje\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/taller/mis-servicios/1/estado/",
+							"host": ["{{base_url}}"],
+							"path": ["taller", "mis-servicios", "1", "estado", ""]
+						}
+					}
+				},
+				{
+					"name": "Reportar Progreso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_taller}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"porcentaje\": 50,\n    \"comentario\": \"Filtro de aceite reemplazado, continuando con el cambio\",\n    \"evidencia_url\": \"https://ejemplo.com/evidencia1.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/taller/servicios/1/progreso/",
+							"host": ["{{base_url}}"],
+							"path": ["taller", "servicios", "1", "progreso", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Historial de Progreso",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token_taller}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/taller/servicios/1/progreso/listar/",
+							"host": ["{{base_url}}"],
+							"path": ["taller", "servicios", "1", "progreso", "listar", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}
